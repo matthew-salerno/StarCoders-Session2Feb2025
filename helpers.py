@@ -6,12 +6,20 @@
 
 import requests
 import json
+import os
+import sys
+from collections.abc import Mapping, Iterable
 
-apiKey='3e3ba345'
+if 'OMDB_API' in os.environ:
+  apiKey = os.environ['OMDB_API']
+else:
+  sys.exit('Could not find OMDB_API environment variable')
 
 # Helper method to parse the different critic ratings input
-def parse_critics_score(critic_scores: list[str]) -> float:
-
+def parse_critics_score(critic_scores: Iterable[Mapping[str, float]]) -> float:
+  """
+  returns total critic score from list of critic scores from different sources
+  """
   num_of_ratings = len(critic_scores)
   total_score = 0.0
  
@@ -32,20 +40,8 @@ def parse_critics_score(critic_scores: list[str]) -> float:
 
   return total_score
 
-# Helper method to print the values of our results in a readable format
-def print_results(responseBody: dict) -> None:
-  """
-  Prints the contents of an omdbapi response
-  """
-  # print (responseBody)
-  print("\nTitle of the movie: ", responseBody['Title'])
-  print("Year: ", responseBody['Year'])
-  print("Rating: ", responseBody['Rated'])
-  print("Genres: ", responseBody['Genre'])
-  print("Critic Scores", responseBody['Ratings'], "\n")
-
 # Helper method to call API
-def get_info_from_api(title: str, year: str) -> dict:
+def get_info_from_api(title: str) -> dict:
   """
   Return a dictionary containing the API response from an omdbapi search for a title and year
   Raises Exception if there is no response
@@ -54,16 +50,14 @@ def get_info_from_api(title: str, year: str) -> dict:
   headers = {
     'Accept': 'application/json'
   }
-  single_search_payload = {'i': 'tt3896198', 'apikey': apiKey}
-  # multiple_search_payload = {'s': title, 'type': media_type, 'apiKey': apiKey}
+  search_payload = {'t': title, 'apikey': apiKey}
  
-  r = requests.get(url=url, params=single_search_payload, headers=headers)
+  r = requests.get(url=url, params=search_payload, headers=headers)
   responseBody = json.loads(r.text)
   if responseBody['Response'] == "False":
     print(responseBody['Error'])
     raise Exception("Error in the search")
   else:
-    print_results(responseBody)
     return responseBody
    
 # ******************************************************

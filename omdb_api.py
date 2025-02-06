@@ -15,31 +15,6 @@ if 'OMDB_API' in os.environ:
 else:
   sys.exit('Could not find OMDB_API environment variable')
 
-# Helper method to parse the different critic ratings input
-def parse_critics_score(critic_scores: Iterable[Mapping[str, float]]) -> float:
-  """
-  returns total critic score from list of critic scores from different sources
-  """
-  num_of_ratings = len(critic_scores)
-  total_score = 0.0
- 
-  for critic_rating in critic_scores:
-    source = critic_rating['Source']
-    value = critic_rating['Value']
-    score = 0.0
-
-    if source == 'Internet Movie Database':
-      value = float(value.split("/")[0])
-      score = value * 10
-    elif source == 'Rotten Tomatoes':
-      score = float(value.split("%")[0])
-    elif source == 'Metacritic':
-      score = float(value.split("/")[0])
-
-    total_score += round(score / num_of_ratings, 1)
-
-  return total_score
-
 # Helper method to call API
 def get_info_from_api(title: str) -> dict:
   """
@@ -61,3 +36,8 @@ def get_info_from_api(title: str) -> dict:
     return responseBody
    
 # ******************************************************
+
+# This part of the code will only run when this file is run*, we use it to tell the user to run main.py
+# * This code would not run if we imported this file from another, for example.
+if __name__ == "__main__":
+  print("Try running main.py instead!")
